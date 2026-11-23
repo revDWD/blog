@@ -1,0 +1,40 @@
+---
+/** <Compare before={{src,alt}} after={{src,alt}} width height labels={["Before","After"]} caption /> : an accessible before/after slider. */
+interface Img { src: string; alt: string }
+interface Props { before: Img; after: Img; width: number; height: number; labels?: [string, string]; caption?: string }
+const { before, after, width, height, labels = ["Before", "After"], caption } = Astro.props;
+const id = `cmp-${Math.random().toString(36).slice(2, 8)}`;
+---
+<figure class="fig d-fig d-compare wide" data-compare>
+  <div class="plate cmp" style="--pos:50%">
+    <img src={after.src} alt={after.alt} width={width} height={height} loading="lazy" decoding="async" />
+    <div class="cmp-before" aria-hidden="false"><img src={before.src} alt={before.alt} width={width} height={height} loading="lazy" decoding="async" /></div>
+    <span class="cmp-line" aria-hidden="true"></span>
+    <span class="cmp-tag mono l" aria-hidden="true">{labels[0]}</span>
+    <span class="cmp-tag mono r" aria-hidden="true">{labels[1]}</span>
+    <label class="visually-hidden" for={id}>Reveal {labels[0].toLowerCase()} versus {labels[1].toLowerCase()}</label>
+    <input id={id} type="range" min="0" max="100" value="50" class="cmp-range" />
+  </div>
+  {caption && <figcaption><span class="num" data-fig-num></span><span>{caption}</span></figcaption>}
+</figure>
+<script>
+  for (const el of document.querySelectorAll<HTMLElement>("[data-compare]")) {
+    const plate = el.querySelector<HTMLElement>(".cmp")!;
+    const range = el.querySelector<HTMLInputElement>(".cmp-range")!;
+    const set = () => plate.style.setProperty("--pos", `${range.value}%`);
+    range.addEventListener("input", set);
+    set();
+  }
+</script>
+<style>
+  .cmp { position: relative; overflow: hidden; touch-action: pan-y; }
+  .cmp img { display: block; width: 100%; height: auto; }
+  .cmp-before { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+  .cmp-before img { width: 100%; height: 100%; object-fit: cover; }
+  .cmp-line { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: var(--coral); pointer-events: none; }
+  .cmp-line::after { content: "⟷"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--coral); color: var(--coral); font-size: 1rem; line-height: 1; }
+  .cmp-tag { position: absolute; top: 0.75rem; padding: 0.15rem 0.5rem; background: var(--surface); border: 1px solid var(--rule); line-height: 1.5; }
+  .cmp-tag.l { left: 0.75rem; } .cmp-tag.r { right: 0.75rem; }
+  .cmp-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
+  .cmp:has(.cmp-range:focus-visible) { outline: 3px solid var(--accent); outline-offset: 3px; }
+</style>

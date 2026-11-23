@@ -1,0 +1,38 @@
+---
+import Base from "../../layouts/Base.astro";
+import { render } from "astro:content";
+import { getNotes, getEntries, fullDate, iso } from "../../lib/content";
+const notes = await getNotes();
+const entries = new Map((await getEntries()).map((e) => [e.id, e]));
+const rendered = await Promise.all(notes.map(async (n) => ({ n, C: (await render(n)).Content })));
+---
+<Base title="Workshop notes" description="Short notes from the Abby + David workshop: measurements, small wins, half-thoughts." current="notes">
+  <header class="page-head wrap">
+    <p class="eyebrow mono">Workshop notes · {notes.length}</p>
+    <h1>Notes from the bench</h1>
+    <p class="lede">The small things: a sentence, a measurement, a half-thought. Too short for a dossier, too good to lose.</p>
+  </header>
+  <div class="wrap">
+    <ol class="notes">
+      {rendered.map(({ n, C }) => {
+        const e = n.data.entry ? entries.get(n.data.entry.id) : undefined;
+        return (
+          <li id={n.id}>
+            <p class="mono"><a href={`/notes/${n.id}/`}><time datetime={iso(n.data.date)}>{fullDate(n.data.date)}</time></a>{e && <> · on <a href={`/projects/${e.id}/`}>{e.data.title}</a></>}{n.data.sample && <> · <span class="sample-stamp">Sample</span></>}</p>
+            <h2>{n.data.title}</h2>
+            <div class="n-body"><C /></div>
+          </li>
+        );
+      })}
+    </ol>
+  </div>
+</Base>
+<style>
+  .notes { list-style: none; margin: 0; padding: 0; }
+  .notes li { padding: 1.5rem 0; border-top: 1px solid var(--rule); display: grid; grid-template-columns: 12rem 1fr; gap: 0.25rem 2rem; }
+  .notes li > p { grid-row: span 2; margin: 0.3rem 0 0; }
+  .notes h2 { font-family: var(--serif); font-weight: 400; font-size: 1.6rem; line-height: 1.15; margin: 0; }
+  .n-body { font-family: var(--serif); font-size: 1.2rem; line-height: 1.5; max-width: 36rem; }
+  .n-body :global(p) { margin: 0.4rem 0 0; }
+  @media (max-width: 40rem) { .notes li { grid-template-columns: 1fr; } .notes li > p { grid-row: auto; } }
+</style>

@@ -1,0 +1,12 @@
+---
+import StarGlyph from "./StarGlyph.astro";
+import { GLYPH_OF } from "../lib/atlas";
+import { STATUS_LABEL } from "../lib/content";
+interface Props { status: string; class?: string }
+const { status, class: cls } = Astro.props;
+const glyph = GLYPH_OF[status];
+---
+<span class:list={["status-pill", cls]} data-glyph={glyph}>
+  <svg viewBox="-12 -12 24 24" aria-hidden="true"><StarGlyph glyph={glyph} r={6.5} /></svg>
+  <span>{STATUS_LABEL[status]}</span>
+</span>

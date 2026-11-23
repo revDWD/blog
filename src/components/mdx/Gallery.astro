@@ -1,0 +1,19 @@
+---
+/** <Gallery caption="…"> with <Figure> children. Scroll-snapping strip on phones, grid on wide screens. */
+interface Props { caption?: string; columns?: 2 | 3 | 4 }
+const { caption, columns = 3 } = Astro.props;
+---
+<div class="d-gallery wide" style={`--cols:${columns}`}>
+  <div class="g-track" tabindex="0" role="region" aria-label={`${caption ?? "Gallery"} (scrolls sideways)`}><slot /></div>
+  {caption && <p class="mono g-cap">{caption}</p>}
+</div>
+<style>
+  .d-gallery { margin-block: 2.5rem; }
+  .g-track { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 1.25rem; }
+  .g-track :global(.d-fig) { margin: 0 !important; }
+  .g-cap { margin: 0.9rem 0 0; }
+  @media (max-width: 40rem) {
+    .g-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 0.9rem; padding-bottom: 0.6rem; }
+    .g-track > :global(*) { flex: 0 0 78%; scroll-snap-align: start; }
+  }
+</style>

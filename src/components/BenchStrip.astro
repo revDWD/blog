@@ -1,0 +1,62 @@
+---
+import StatusPill from "./StatusPill.astro";
+import { getBench, getEntries, shortDate, iso, joinNames, ids } from "../lib/content";
+import { getCollection } from "astro:content";
+interface Props { sections?: string[]; compact?: boolean; level?: 2 | 3 }
+const { sections, compact = false, level = 2 } = Astro.props;
+const H = `h${level}`;
+const Shelf = compact ? "div" : "section";
+const bench = (await getBench()).filter((s) => !sections || sections.includes(s.id));
+const entries = new Map((await getEntries()).map((e) => [e.id, e]));
+const authors = new Map((await getCollection("authors")).map((a) => [a.id, a.data.name]));
+---
+<div class:list={["bench", { compact }]}>
+  {bench.map((s) => (
+    <Shelf class="shelf" aria-labelledby={compact ? undefined : `shelf-${s.id}`}>
+      {compact ? <p class="shelf-title">{s.data.title}</p> : <H id={`shelf-${s.id}`} class="shelf-title">{s.data.title}</H>}
+      {s.data.dek && !compact && <p class="shelf-dek">{s.data.dek}</p>}
+      <ul class="tags-list">
+        {s.data.items.map((it) => {
+          const e = it.entry ? entries.get(it.entry.id) : undefined;
+          const href = e ? `/projects/${e.id}/` : it.href;
+          const when = e ? (e.data.updated ?? e.data.started) : undefined;
+          const who = e ? joinNames(ids(e.data.authors).map((a) => authors.get(a) ?? a)) : undefined;
+          return (
+            <li class="tag-card">
+              <span class="string" aria-hidden="true"></span>
+              <p class="t-title">{href ? <a href={href}>{it.title}</a> : it.title}</p>
+              {it.note && <p class="t-note">{it.note}</p>}
+              <p class="t-meta mono">
+                {e && <StatusPill status={e.data.status} />}
+                {when && <span>Last tended <time datetime={iso(when)} data-relative>{shortDate(when)}</time>{who && <> by {who}</>}</span>}
+                {it.sample && <span class="sample-stamp">Sample</span>}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    </Shelf>
+  ))}
+</div>
+<style>
+  .bench { display: grid; gap: 2rem; }
+  .shelf-title { font-family: var(--mono); font-size: 0.8rem; font-weight: 400; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 0.35rem; }
+  .shelf-dek { font-family: var(--serif); font-style: italic; color: var(--muted); margin: 0 0 0.9rem; }
+  .tags-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; }
+  .tag-card {
+    position: relative; padding: 1.1rem 1rem 0.9rem 1.15rem; background: var(--surface); border: 1px solid var(--edge);
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+    transition: transform 0.35s var(--ease-out);
+  }
+  .tag-card:hover { transform: rotate(-0.6deg) translateY(-2px); }
+  .string { position: absolute; top: 0.7rem; right: 1.35rem; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--edge); background: var(--paper); }
+  .t-title { font-family: var(--serif); font-size: 1.3rem; line-height: 1.2; margin: 0 1rem 0.3rem 0; }
+  .t-note { margin: 0 0 0.6rem; color: var(--muted); font-size: 0.98rem; }
+  .t-meta { margin: 0; display: flex; flex-wrap: wrap; gap: 0.25rem 0.9rem; align-items: center; }
+  .compact .tags-list { grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); }
+  @media (max-width: 40rem) {
+    .compact .tags-list { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 0.5rem; }
+    .compact .tag-card { flex: 0 0 82%; scroll-snap-align: start; }
+  }
+  @media (prefers-reduced-motion: reduce) { .tag-card:hover { transform: none; } }
+</style>

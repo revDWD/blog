@@ -1,0 +1,25 @@
+---
+import Base from "../../layouts/Base.astro";
+import { render } from "astro:content";
+import * as mdx from "../../components/mdx";
+import { getLogs, getEntries, fullDate, iso, no } from "../../lib/content";
+export async function getStaticPaths() {
+  const entries = new Map((await getEntries()).map((e) => [e.id, e]));
+  return (await getLogs()).filter((l) => entries.has(l.data.entry.id)).map((log) => ({ params: { slug: log.id }, props: { log, entry: entries.get(log.data.entry.id)! } }));
+}
+const { log, entry } = Astro.props;
+const { Content } = await render(log);
+---
+<Base title={`${log.data.title} · ${entry.data.title}`} description={log.data.summary} type="article" published={log.data.date} noindex={log.data.sample}>
+  <article class="wrap">
+    <header class="page-head">
+      <p class="eyebrow mono"><a href={`/projects/${entry.id}/`}>← {no(entry.data.no)} {entry.data.title}</a> · Build log · <time datetime={iso(log.data.date)}>{fullDate(log.data.date)}</time>{log.data.sample && <> · <span class="sample-stamp">Sample</span></>}</p>
+      <h1>{log.data.title}</h1>
+      <p class="lede">{log.data.summary}</p>
+    </header>
+    <div class="log-body"><Content components={mdx} /></div>
+  </article>
+</Base>
+<style>
+  .log-body { max-width: 40rem; font-size: clamp(1.08rem, 1rem + 0.25vw, 1.2rem); line-height: 1.7; }
+</style>

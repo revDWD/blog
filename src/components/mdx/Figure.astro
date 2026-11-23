@@ -1,0 +1,9 @@
+---
+/** <Figure src alt width height caption wide pixel /> : numbered automatically by the dossier. */
+interface Props { src: string; alt: string; width: number; height: number; caption?: string; wide?: boolean; pixel?: boolean }
+const { src, alt, width, height, caption, wide = false, pixel = false } = Astro.props;
+---
+<figure class:list={["fig", "d-fig", { wide, pixel }]}>
+  <div class="plate"><img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" /></div>
+  {caption && <figcaption><span class="num" data-fig-num></span><span>{caption}</span></figcaption>}
+</figure>

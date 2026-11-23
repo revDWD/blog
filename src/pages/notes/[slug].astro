@@ -1,0 +1,25 @@
+---
+import Base from "../../layouts/Base.astro";
+import { render } from "astro:content";
+import { getNotes, getEntries, fullDate, iso } from "../../lib/content";
+export async function getStaticPaths() {
+  return (await getNotes()).map((note) => ({ params: { slug: note.id }, props: { note } }));
+}
+const { note } = Astro.props;
+const { Content } = await render(note);
+const e = note.data.entry ? (await getEntries()).find((x) => x.id === note.data.entry!.id) : undefined;
+---
+<Base title={note.data.title} description={`A workshop note from ${fullDate(note.data.date)}.`} type="article" published={note.data.date} noindex={note.data.sample} current="notes">
+  <article class="wrap note">
+    <header class="page-head">
+      <p class="eyebrow mono"><a href="/notes/">← Notes</a> · <time datetime={iso(note.data.date)}>{fullDate(note.data.date)}</time>{note.data.sample && <> · <span class="sample-stamp">Sample</span></>}</p>
+      <h1>{note.data.title}</h1>
+    </header>
+    <div class="n-body"><Content /></div>
+    {e && <p class="mono on">About: <a href={`/projects/${e.id}/`}>{e.data.title}</a></p>}
+  </article>
+</Base>
+<style>
+  .n-body { font-family: var(--serif); font-size: clamp(1.3rem, 1.15rem + 0.5vw, 1.6rem); line-height: 1.5; max-width: 38rem; }
+  .on { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+</style>

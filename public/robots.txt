@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://blog.abbydavid.com/sitemap-index.xml

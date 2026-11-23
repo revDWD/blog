@@ -1,0 +1,103 @@
+---
+no: 5
+title: The Workshop Atlas
+dek: Designing a project journal that feels like a place. Why this site is a star chart and not a blog.
+kind: build
+field: software
+fields: [creative, writing]
+tags: [web, design, astro, accessibility, this-site]
+status: building
+started: 2026-11-23
+updated: 2026-11-23
+related: [ecotox-id, at-fitness-tracker]
+stack: [Astro, MDX, SVG, CSS view transitions]
+featured: true
+magnitude: 5
+---
+
+The brief was a single sentence with a lot of weight on it: *visitors should feel they're entering a place, not reading a blog.* This dossier is the record of how that turned into a star chart.
+
+## Three ways in
+
+We sketched three concepts and argued with each of them.
+
+**A · Project Universe.** Every entry is a node in a force-directed graph, clustered by theme. It grows naturally and shows connections between interests. But the common version (black starfield, glowing dots, physics jiggle) is the most familiar "creative portfolio" of the last decade. Force layouts also rearrange themselves whenever content changes, so nothing ever has a *place*.
+
+**B · Workshop Desk.** An illustrated workbench, where the notebook leads to essays, the microscope to science and the trail map to trips. It's the warmest of the three on a first visit. On closer look it's a category menu with drawings: seven objects are seven fixed doors, and entry No. 200 has nowhere to go.
+
+**C · The Night Atlas.** Concept A's structure, Concept B's sense of real objects, and the catalogue voice abbydavid.com already uses. Fields become constellations and entries become stars. Each star's position is computed from its catalogue number, so it never moves.
+
+<Compare
+  before={{ src: "/media/workshop/desk-wireframe.svg", alt: "Wireframe of the Workshop Desk concept: seven dashed object outlines on a wooden desk, each labelled with the category it opens." }}
+  after={{ src: "/media/workshop/atlas-wireframe.svg", alt: "Wireframe of the Night Atlas concept: eight small constellations on a curved graticule, with a specimen card open beside a coral star." }}
+  width={1200}
+  height={750}
+  labels={["Desk", "Atlas"]}
+  caption="Concept B against Concept C. Drag to compare."
+/>
+
+<Note kind="aside">The desk didn't lose. Its warmth lives on in *On the bench*: the strip under the chart that shows what's being made right now.</Note>
+
+## Four looks
+
+The visual direction had to fit beside abbydavid.com: warm paper, deep ink, teal links, coral bookmark ribbons, Newsreader for headings.
+
+<Gallery columns={2} caption="Four visual directions. V4 uses the parent site's tokens unchanged.">
+  <Figure src="/media/workshop/v1-deep-space.svg" alt="V1, deep space: glowing cyan dots on a black starfield." width={800} height={560} caption="V1 · Deep space" />
+  <Figure src="/media/workshop/v2-cyanotype.svg" alt="V2, cyanotype: white drafting lines on Prussian blue." width={800} height={560} caption="V2 · Cyanotype" />
+  <Figure src="/media/workshop/v3-field-notebook.svg" alt="V3, field notebook: ruled cream paper with a taped photo." width={800} height={560} caption="V3 · Field notebook" />
+  <Figure src="/media/workshop/v4-engraved-atlas.svg" alt="V4, engraved atlas: ink constellations on warm paper with one coral star." width={800} height={560} caption="V4 · Engraved atlas" />
+</Gallery>
+
+## How a star finds its place
+
+Each constellation lays its stars on a golden-angle spiral, in order of catalogue number. The first star sits near the centre and later ones spiral outward. Because the order never changes, nothing already on the chart moves when something new is added.
+
+```ts
+const GOLDEN = Math.PI * (3 - Math.sqrt(5)); // ≈ 137.5°
+
+const pts = list.map((entry, i) => {
+  const r = spacing * Math.sqrt(i + 0.35);   // equal area per star
+  const θ = i * GOLDEN + rotation;          // each field has its own rotation…
+  const x = Math.cos(θ) * r * stretch;      // …and stretch, so no two figures match
+  const y = Math.sin(θ) * r;
+  return rotate({ x, y }, tilt, centre);
+});
+```
+
+The lines between stars are a minimum spanning tree: the shortest set of lines that joins every star in the field. That's why each field reads as a constellation figure and the chart never turns into a hairball.
+
+<Note kind="lesson">
+A spatial interface is only worth having if position *means* something and *stays put*. A visitor who comes back after a month should find Ecotox ID exactly where it was.
+</Note>
+
+## What the critic changed
+
+Before any code, an independent reviewer pulled the proposal apart. Most of what it said was right.
+
+<Note kind="failure" title="Astronomy cosplay">
+The first draft gave every entry a right ascension and declination, as in "RA 14h 22m · Dec +31°". They looked lovely and meant nothing: coordinates derived from a made-up layout. They're gone. Entries are located by their catalogue line, and "Find it on the atlas" takes you back to their star.
+</Note>
+
+- **One pulse, not many.** Only the most recently tended build animates. Everything else holds still.
+- **Phones get strips, not a pannable map.** A chart you can drag inside a page you scroll is a scroll trap. On small screens the sky becomes a still picture, and each constellation gets its own strip below it.
+- **One tab stop.** Keyboard users tab into the chart once, then move with the arrow keys. `[` and `]` jump between constellations.
+- **Plates, not noise.** Entries without photographs show their own star highlighted in its constellation, rather than a generic generative pattern.
+
+<Log title="Build log">
+  <LogEntry date="2026-11-23" title="Research and three concepts" status="Researching">
+    Looked at digital gardens, star atlases, workbench portfolios and museum collection explorers. Wrote up the Universe, the Desk and the Atlas.
+  </LogEntry>
+  <LogEntry date="2026-11-23" title="Independent critique" status="Exploring">
+    The proposal went to a reviewer who hadn't seen the work being made. Coordinates cut, mobile rethought, motion reduced.
+  </LogEntry>
+  <LogEntry date="2026-11-23" title="First light" status="Building">
+    The atlas renders at build time as plain SVG with real links. Hover cards, zoom and keyboard navigation are added on top.
+  </LogEntry>
+</Log>
+
+<Note kind="next">
+- Replace the sample entries with real dossiers.
+- Add a "Workshop" link to the abbydavid.com header.
+- Try an `/lab/` section for interactive demos. Each one gets a star on the chart.
+</Note>

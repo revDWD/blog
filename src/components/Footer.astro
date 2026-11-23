@@ -1,0 +1,34 @@
+---
+import { getAtlas } from "../lib/content";
+const atlas = await getAtlas();
+const year = new Date().getUTCFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap-wide">
+    <div class="sig">
+      <p class="mark"><a class="plain" href="https://abbydavid.com/">Abby<span>+</span>David</a></p>
+      <p class="mono">The workshop · St. Louis, Missouri · 38.63° N, 90.20° W</p>
+    </div>
+    <ul class="links mono">
+      <li><a href="https://abbydavid.com/">← abbydavid.com</a></li>
+      <li><a href="https://abbydavid.com/projects/">The project archive</a></li>
+      <li><a href="/ledger/">Ledger</a></li>
+      <li><a href="/rss.xml">RSS</a></li>
+    </ul>
+    <p class="mono colophon">
+      © {year} · Epoch {atlas.epoch} · {atlas.stars.length} stars in {atlas.constellations.length} constellations
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer { margin-top: clamp(4rem, 10vw, 7rem); padding: 2rem 0 2.5rem; border-top: 1px solid var(--rule); }
+  .site-footer .wrap-wide { display: grid; grid-template-columns: 1fr auto; gap: 1rem 2rem; align-items: end; }
+  .sig p { margin: 0; }
+  .mark { font-family: var(--serif); font-size: 1.6rem; font-weight: 400; line-height: 1.2; margin-bottom: 0.35rem !important; }
+  .mark span { color: var(--coral); font-style: italic; margin-inline: 0.15em; }
+  .links { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; list-style: none; margin: 0; padding: 0; }
+  .links a { display: inline-block; padding-block: 0.6rem; }
+  .colophon { grid-column: 1 / -1; margin: 0; }
+  @media (max-width: 40rem) { .site-footer .wrap-wide { grid-template-columns: 1fr; } }
+</style>

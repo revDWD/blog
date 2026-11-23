@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from "astro:content";
+import StatusPill from "./StatusPill.astro";
+import { no, monthYear, KIND_LABEL, tended, iso } from "../lib/content";
+interface Props { entries: CollectionEntry<"entries">[]; fieldNames: Record<string, string>; level?: 2 | 3 }
+const { entries, fieldNames, level = 3 } = Astro.props;
+const H = `h${level}`;
+---
+<ol class="ledger">
+  {entries.map((e) => (
+    <li class="row" data-field={e.data.field.id} data-also={e.data.fields.map((f) => f.id).join(" ")} data-status={e.data.status} data-kind={e.data.kind} hidden={false}>
+      <p class="meta mono">{no(e.data.no)} · {fieldNames[e.data.field.id]}</p>
+      <div class="main">
+        <H class="r-title"><a class="stretch" href={`/projects/${e.id}/`}>{e.data.title}</a></H>
+        <p class="dek-line">{e.data.dek}</p>
+      </div>
+      <p class="side mono">
+        <StatusPill status={e.data.status} />
+        <span class="when">{KIND_LABEL[e.data.kind]} · <time datetime={iso(tended(e))}>{monthYear(tended(e))}</time></span>
+        {e.data.sample && <span class="sample-stamp">Sample</span>}
+      </p>
+    </li>
+  ))}
+</ol>
+<style>
+  .ledger { list-style: none; margin: 0; padding: 0; counter-reset: none; }
+  .row {
+    position: relative; display: grid; grid-template-columns: 11rem minmax(0, 1fr) 12rem; gap: 0.25rem 1.5rem;
+    align-items: baseline; padding: 1.3rem 0; border-bottom: 1px solid var(--rule);
+  }
+  .row[hidden] { display: none; }
+  .row::before { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+  .row:hover::before, .row:focus-within::before { transform: scaleX(1); }
+  .meta { margin: 0; }
+  .r-title { font-family: var(--serif); font-weight: 400; font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.75rem); line-height: 1.15; margin: 0 0 0.3rem; letter-spacing: -0.01em; }
+  .stretch { background-image: none; }
+  .stretch::after { content: ""; position: absolute; inset: 0; }
+  .stretch:focus-visible { outline: none; }
+  .row:focus-within { outline: 3px solid var(--accent); outline-offset: 4px; }
+  .row:hover .r-title a { color: var(--accent); }
+  .dek-line { margin: 0; color: var(--muted); font-size: 1rem; max-width: 40rem; text-wrap: pretty; }
+  .side { margin: 0; display: flex; flex-direction: column; gap: 0.3rem; align-items: flex-start; }
+  .when { color: var(--muted); }
+  .sample-stamp { margin-top: 0.15rem; }
+  @media (max-width: 48rem) {
+    .row { grid-template-columns: 1fr; gap: 0.35rem; }
+    .side { flex-direction: row; flex-wrap: wrap; gap: 0.3rem 1rem; }
+  }
+</style>

@@ -1,0 +1,83 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string; // absolute or site-relative path to a 1200×630 image
+  imageAlt?: string;
+  type?: "website" | "article";
+  jsonld?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+  current?: "atlas" | "ledger" | "bench" | "notes";
+  published?: Date;
+  modified?: Date;
+}
+const { title, description, image = "/og/default.png", imageAlt = "The Abby + David workshop atlas: projects charted as stars.", type = "website", jsonld, noindex = false, current, published, modified } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image, Astro.site);
+const fullTitle = title === "Workshop" ? "Workshop · Abby + David" : `${title} · Abby + David Workshop`;
+
+const siteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Abby + David Workshop",
+  url: "https://blog.abbydavid.com/",
+  isPartOf: { "@type": "WebSite", name: "Abby + David", url: "https://abbydavid.com/" },
+};
+const ld = [siteLd, ...(jsonld ? (Array.isArray(jsonld) ? jsonld : [jsonld]) : [])];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f4eee1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title="Abby + David Workshop" href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href="/fonts/newsreader-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:site_name" content="Abby + David Workshop" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    {modified && <meta property="article:modified_time" content={modified.toISOString()} />}
+    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+
+    <!-- Theme before paint. Shares abbydavid.com's key; a .abbydavid.com cookie carries the choice across subdomains. -->
+    <script is:inline>
+      (function(){var d=document.documentElement,t=null,m;try{m=document.cookie.match(/(?:^|; )abbydavid-theme=(light|dark)/);t=m?m[1]:localStorage.getItem("abbydavid-theme")}catch(e){}
+      if(t!=="light"&&t!=="dark")t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+      d.setAttribute("data-theme",t);d.style.colorScheme=t;
+      try{if(sessionStorage.getItem("workshop-drawn"))d.setAttribute("data-drawn","")}catch(e){}
+      d.classList.add("js")})()
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header current={current} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import "../scripts/site";
+    </script>
+  </body>
+</html>

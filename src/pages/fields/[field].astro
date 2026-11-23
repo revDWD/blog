@@ -1,0 +1,52 @@
+---
+import Base from "../../layouts/Base.astro";
+import SkyView from "../../components/SkyView.astro";
+import LedgerList from "../../components/LedgerList.astro";
+import { frame } from "../../lib/atlas";
+import { getAtlas, getEntries, getFields } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const atlas = await getAtlas();
+  const fields = await getFields();
+  return atlas.constellations.map((c) => ({ params: { field: c.id }, props: { c, field: fields.find((f) => f.id === c.id)! } }));
+}
+const { c, field } = Astro.props;
+const atlas = await getAtlas();
+const all = await getEntries();
+const fieldNames = Object.fromEntries((await getFields()).map((f) => [f.id, f.data.name]));
+const primary = all.filter((e) => e.data.field.id === c.id);
+const also = all.filter((e) => e.data.field.id !== c.id && e.data.fields.some((f) => f.id === c.id));
+const others = atlas.constellations.filter((o) => o.id !== c.id);
+---
+<Base title={`${field.data.name}: a constellation`} description={`${field.data.description} ${c.count} ${c.count === 1 ? "entry" : "entries"} in the Abby + David workshop.`}>
+  <header class="page-head wrap-wide">
+    <p class="eyebrow mono"><a href="/">← Atlas</a> · Constellation · {c.count} {c.count === 1 ? "star" : "stars"}</p>
+    <h1>{field.data.name}</h1>
+    <p class="lede">{field.data.description}</p>
+  </header>
+  <figure class="fig wrap-wide field-sky">
+    <div class="plate"><SkyView atlas={atlas} viewBox={frame(c, 1.5, 2.4)} focusField={c.id} labelAll label={`The ${field.data.name} constellation`} /></div>
+  </figure>
+  <div class="wrap">
+    <section class="section" aria-labelledby="in-title">
+      <div class="section-head"><h2 id="in-title">In this constellation</h2></div>
+      <LedgerList entries={primary} fieldNames={fieldNames} />
+    </section>
+    {also.length > 0 && (
+      <section class="section" aria-labelledby="also-title">
+        <div class="section-head"><h2 id="also-title">Also touching {field.data.name}</h2></div>
+        <LedgerList entries={also} fieldNames={fieldNames} />
+      </section>
+    )}
+    <nav class="section neighbours" aria-label="Other constellations">
+      <div class="section-head"><h2>Other constellations</h2></div>
+      <ul>{others.map((o) => <li><a href={`/fields/${o.id}/`}>{o.name}</a> <span class="mono">{o.count}</span></li>)}</ul>
+    </nav>
+  </div>
+</Base>
+<style>
+  .field-sky .plate { background: var(--paper); }
+  .field-sky :global(.sky) { aspect-ratio: 2.4; }
+  .neighbours ul { list-style: none; padding: 0; margin: 0.75rem 0 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem; }
+  .neighbours a { font-family: var(--serif); font-size: 1.35rem; }
+</style>

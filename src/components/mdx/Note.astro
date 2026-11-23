@@ -1,0 +1,35 @@
+---
+/**
+ * Labelled notebook blocks: <Note kind="lesson">, <Note kind="failure">, <Note kind="next">, <Note kind="aside">.
+ * Lessons Learned, Failures Encountered and Future Plans read as specimen labels, not alert boxes.
+ * kind="aside" floats into the right margin on wide screens (a sidenote).
+ */
+interface Props { kind: "lesson" | "failure" | "next" | "aside"; title?: string }
+const { kind, title } = Astro.props;
+const defaults = { lesson: "Lesson learned", failure: "What went wrong", next: "What happens next", aside: "Margin note" };
+const marks = { lesson: "✓", failure: "✕", next: "→", aside: "※" };
+---
+<aside class:list={["d-note", `n-${kind}`]} aria-label={title ?? defaults[kind]}>
+  <p class="n-head mono"><span class="n-mark" aria-hidden="true">{marks[kind]}</span>{title ?? defaults[kind]}</p>
+  <div class="n-body"><slot /></div>
+</aside>
+<style>
+  .d-note { margin: 2rem 0; padding: 1rem 1.15rem 1.05rem; border: 1px solid var(--rule); background: var(--surface); position: relative; }
+  .d-note::before { content: ""; position: absolute; left: -1px; top: -1px; bottom: -1px; width: 3px; background: var(--edge); }
+  .n-failure::before { background: var(--coral); }
+  .n-lesson::before { background: var(--moss); }
+  .n-next::before { background: var(--accent); }
+  .n-head { margin: 0 0 0.45rem; display: flex; gap: 0.5rem; align-items: baseline; color: var(--ink); }
+  .n-mark { color: var(--muted); }
+  .n-failure .n-mark { color: var(--coral); }
+  .n-lesson .n-mark { color: var(--moss); }
+  .n-next .n-mark { color: var(--accent); }
+  .n-body { font-size: 1rem; }
+  .n-body :global(p) { margin: 0 0 0.6rem; }
+  .n-body :global(p:last-child), .n-body :global(ul:last-child) { margin-bottom: 0; }
+  .n-aside { border: 0; background: none; padding: 0.2rem 0 0.2rem 0.9rem; border-left: 1px solid var(--rule); font-size: 0.92rem; color: var(--muted); }
+  .n-aside::before { display: none; }
+  @media (min-width: 78rem) {
+    .n-aside { float: right; clear: right; width: 15rem; margin: 0.3rem -18rem 1rem 0; }
+  }
+</style>

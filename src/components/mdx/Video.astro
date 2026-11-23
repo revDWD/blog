@@ -1,0 +1,45 @@
+---
+/**
+ * <Video youtube="ID" title="…" />  or  <Video src="/media/clip.mp4" poster="/media/clip.jpg" title="…" />
+ * YouTube loads nothing until pressed (privacy + performance). Files use native controls.
+ */
+interface Props { youtube?: string; src?: string; poster?: string; title: string; caption?: string; ratio?: string }
+const { youtube, src, poster, title, caption, ratio = "16 / 9" } = Astro.props;
+const thumb = poster ?? (youtube ? `https://i.ytimg.com/vi/${youtube}/hqdefault.jpg` : undefined);
+---
+<figure class="fig d-fig d-video wide">
+  <div class="plate vid" style={`aspect-ratio:${ratio}`}>
+    {src ? (
+      <video controls preload="none" poster={poster} src={src} title={title}></video>
+    ) : (
+      <button type="button" class="vid-btn" data-yt={youtube} data-title={title} aria-label={`Play video: ${title}`}>
+        {thumb && <img src={thumb} alt="" loading="lazy" decoding="async" />}
+        <span class="vid-play" aria-hidden="true">▶</span>
+        <span class="vid-note mono">Plays from YouTube when pressed</span>
+      </button>
+    )}
+  </div>
+  {caption && <figcaption><span class="num" data-fig-num></span><span>{caption}</span></figcaption>}
+</figure>
+<script>
+  for (const b of document.querySelectorAll<HTMLButtonElement>(".vid-btn[data-yt]")) {
+    b.addEventListener("click", () => {
+      const f = document.createElement("iframe");
+      f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0`;
+      f.title = b.dataset.title ?? "Video";
+      f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      f.setAttribute("allowfullscreen", "");
+      b.replaceWith(f);
+      f.focus();
+    }, { once: true });
+  }
+</script>
+<style>
+  .vid { position: relative; }
+  .vid video, .vid :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .vid-btn { position: absolute; inset: 0; width: 100%; border: 0; padding: 0; cursor: pointer; background: var(--paper-deep); color: var(--ink); }
+  .vid-btn img { width: 100%; height: 100%; object-fit: cover; }
+  .vid-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 4.5rem; height: 4.5rem; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 1.5px solid var(--edge); font-size: 1.4rem; transition: transform 0.3s var(--ease-out), border-color 0.2s; }
+  .vid-btn:hover .vid-play, .vid-btn:focus-visible .vid-play { transform: translate(-50%, -50%) scale(1.06); border-color: var(--coral); color: var(--coral); }
+  .vid-note { position: absolute; left: 0.75rem; bottom: 0.6rem; background: var(--surface); padding: 0.1rem 0.45rem; }
+</style>
