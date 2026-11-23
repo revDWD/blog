@@ -11,7 +11,7 @@ npm run build        # static site → dist/
 npm run build:clean  # same, with every `sample: true` item stripped
 ```
 
-**Deploy (Cloudflare Pages or any static host):** build command `npm run build`, output directory `dist`, Node 20+.
+**Deploy (Cloudflare Pages or any static host):** build command `npm run build`, output directory `dist`. Astro needs **Node 22.23.4 or newer**: the repo pins it in `.node-version`, and on Cloudflare you can also set the `NODE_VERSION` environment variable to `22.23.5`.
 No server and no environment variables are required. `INCLUDE_SAMPLES=false` strips the placeholder content.
 
 ---
