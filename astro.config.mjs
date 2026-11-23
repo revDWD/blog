@@ -38,6 +38,9 @@ export default defineConfig({
   integrations: [mdx(), sitemap({ filter: (page) => !skip.has(new URL(page).pathname) })],
   build: { inlineStylesheets: "auto", assets: "assets" },
   vite: {
+    // native module: never bundle it (see src/lib/og.ts)
+    ssr: { external: ["@resvg/resvg-js"] },
+    optimizeDeps: { exclude: ["@resvg/resvg-js"] },
     build: {
       rollupOptions: {
         // hash-only names: no leading underscores, nothing to collide

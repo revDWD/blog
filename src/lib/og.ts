@@ -3,12 +3,22 @@
  * build identically on any machine. Each entry's image shows its own star highlighted in its
  * constellation: every share is a small advert for the atlas.
  */
-import { Resvg } from "@resvg/resvg-js";
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import type { Atlas, Star, Glyph } from "./atlas";
 
 const require = createRequire(import.meta.url);
+// resvg ships a native binary per platform. Load it at runtime with require() so the bundler
+// never tries to pack the .node file (it can't, and fails on some build machines).
+// If the binary can't load on a build machine, every share image falls back to a static one
+// (public/og-fallback.png) instead of failing the deploy.
+let Resvg: typeof import("@resvg/resvg-js").Resvg | null = null;
+try {
+  ({ Resvg } = require("@resvg/resvg-js") as typeof import("@resvg/resvg-js"));
+} catch (e) {
+  console.warn("[og] resvg unavailable, using public/og-fallback.png for share images:", (e as Error).message);
+}
+let fallback: Buffer | null = null;
 const font = (p: string) => readFileSync(require.resolve(p));
 let fonts: Buffer[] | null = null;
 const loadFonts = () =>
@@ -114,7 +124,7 @@ const frameSvg = () => `<rect width="1200" height="630" fill="${C.paper}"/><rect
 
 function render(inner: string) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">${inner}</svg>`;
-  if (process.env.OG_DEBUG) require("node:fs").writeFileSync("/tmp/og-last.svg", svg);
+  if (!Resvg) return (fallback ??= readFileSync(`${process.cwd()}/public/og-fallback.png`));
   const r = new Resvg(svg, { font: { fontBuffers: loadFonts(), loadSystemFonts: false, defaultFontFamily: "Newsreader" }, fitTo: { mode: "width", value: 1200 } });
   return r.render().asPng();
 }
