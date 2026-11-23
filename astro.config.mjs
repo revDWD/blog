@@ -3,13 +3,14 @@ import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import { readdirSync, readFileSync } from "node:fs";
+import shareImages from "./integrations/og.ts";
 
 /**
  * Pages that carry `noindex` stay out of the sitemap too: sample content, and tag pages with
  * fewer than two entries (the same rule as src/pages/tags/[tag].astro).
  */
 function unlisted() {
-  const out = new Set(["/404/"]);
+  const out = new Set(["/404/", "/atlas.json"]);
   const front = (file) => readFileSync(file, "utf8").split(/^---$/m)[1] ?? "";
   const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   const tags = new Map();
@@ -35,12 +36,9 @@ const skip = unlisted();
 export default defineConfig({
   site: "https://blog.abbydavid.com",
   trailingSlash: "always",
-  integrations: [mdx(), sitemap({ filter: (page) => !skip.has(new URL(page).pathname) })],
+  integrations: [mdx(), sitemap({ filter: (page) => !skip.has(new URL(page).pathname) }), shareImages()],
   build: { inlineStylesheets: "auto", assets: "assets" },
   vite: {
-    // native module: never bundle it (see src/lib/og.ts)
-    ssr: { external: ["@resvg/resvg-js"] },
-    optimizeDeps: { exclude: ["@resvg/resvg-js"] },
     build: {
       rollupOptions: {
         // hash-only names: no leading underscores, nothing to collide

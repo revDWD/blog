@@ -5,7 +5,8 @@ import { buildAtlas, type Atlas } from "./atlas";
  * Sample (placeholder) content ships with the starter so the atlas has something to show.
  * Build with INCLUDE_SAMPLES=false to strip every entry, log, note and bench item marked `sample: true`.
  */
-export const INCLUDE_SAMPLES = (process.env.INCLUDE_SAMPLES ?? "true") !== "false";
+const env = (typeof process !== "undefined" && process.env) || {};
+export const INCLUDE_SAMPLES = (import.meta.env.INCLUDE_SAMPLES ?? env.INCLUDE_SAMPLES ?? "true") !== "false";
 const keep = (d: { draft?: boolean; sample?: boolean }) =>
   !(import.meta.env.PROD && d.draft) && (INCLUDE_SAMPLES || !d.sample);
 

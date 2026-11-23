@@ -1,0 +1,12 @@
+// Cloudflare: serve the built site as static files. Having this file also stops Cloudflare's
+// build from auto-adding its Astro adapter (this site has no server code).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "blog",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
