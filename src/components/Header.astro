@@ -77,7 +77,7 @@ const nav = [
     .site-nav li > a { padding-inline: 0.45rem; font-size: 0.95rem; }
     .theme-toggle .state { display: none; }
     .theme-toggle .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-    .theme-toggle::before { content: "Dark"; font-size: 0.95rem; color: var(--muted); }
+    .theme-toggle::before { content: "Dark"; content: "Dark" / ""; font-size: 0.95rem; color: var(--muted); } /* shown, not announced */
     .theme-toggle { gap: 0.35rem; margin-left: 0; }
     .theme-toggle .track { width: 2.2rem; }
     .theme-toggle[aria-checked="true"] .track::after { transform: translateX(0.8rem); }
