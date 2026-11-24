@@ -1,79 +1,54 @@
 ---
 import Base from "../layouts/Base.astro";
-import Atlas from "../components/Atlas.astro";
-import BenchStrip from "../components/BenchStrip.astro";
-import LedgerList from "../components/LedgerList.astro";
-import StatusPill from "../components/StatusPill.astro";
-import { getAtlas, getEntries, getFields, getNotes, no, shortDate, iso, tended } from "../lib/content";
+import ProjectGrid from "../components/ProjectGrid.astro";
+import Status from "../components/Status.astro";
+import { getProjects, no } from "../lib/content";
+import { ACTIVE } from "../lib/site";
 
-const atlas = await getAtlas();
-const entries = await getEntries();
-const fieldNames = Object.fromEntries((await getFields()).map((f) => [f.id, f.data.name]));
-const finished = entries
-  .filter((e) => ["completed", "evolving"].includes(e.data.status))
-  .sort((a, b) => +tended(b) - +tended(a))
-  .slice(0, 4);
-const notes = (await getNotes()).slice(0, 4);
-const recent = [...entries].sort((a, b) => +tended(b) - +tended(a)).slice(0, 6);
+const projects = await getProjects();
+const bench = projects.filter((p) => ACTIVE.has(p.data.status));
+const featured = projects.filter((p) => p.data.featured);
+const shown = (featured.length >= 2 ? featured : projects).slice(0, 4);
 ---
-<Base title="Workshop" description="The Abby + David workshop: everything we make, charted as stars. Projects, experiments, research and trips, each with a dossier." current="atlas">
-  <Atlas atlas={atlas} />
-
+<Base title="Workshop" description="The Abby + David workshop: write-ups of the things we make, what each one is, and where it stands." current="home">
   <div class="wrap">
-    <section class="section" aria-labelledby="bench-title">
-      <div class="section-head">
-        <h2 id="bench-title">On the bench</h2>
-        <a class="more" href="/bench/">The whole bench →</a>
-      </div>
-      <p class="dek">What we're making right now, and what's queued.</p>
-      <BenchStrip sections={["now", "next"]} compact />
-    </section>
+    <header class="page-head">
+      <h1>The workshop</h1>
+      <p class="lede">Write-ups of the things we make: what each one is, how it works, and where it stands.</p>
+    </header>
 
-    <div class="pair">
-      <section class="section" aria-labelledby="done-title">
-        <div class="section-head"><h2 id="done-title">Recently finished</h2></div>
-        <ul class="done-list">
-          {finished.map((e) => (
+    {bench.length > 0 && (
+      <section class="section" aria-labelledby="bench-title">
+        <div class="section-head"><h2 id="bench-title">On the bench</h2></div>
+        <ul class="bench">
+          {bench.map((p) => (
             <li>
-              <p class="mono">{no(e.data.no)} · {fieldNames[e.data.field.id]}</p>
-              <p class="d-title"><a href={`/projects/${e.id}/`}>{e.data.title}</a></p>
-              <p class="mono"><StatusPill status={e.data.status} />{e.data.sample && <> <span class="sample-stamp">Sample</span></>}</p>
+              <p class="mono">{no(p.data.no)} · <Status status={p.data.status} /></p>
+              <p class="b-title"><a href={`/projects/${p.id}/`}>{p.data.title}</a></p>
+              <p class="b-sum">{p.data.summary}</p>
             </li>
           ))}
         </ul>
       </section>
-      <section class="section" aria-labelledby="notes-title">
-        <div class="section-head">
-          <h2 id="notes-title">Workshop notes</h2>
-          <a class="more" href="/notes/">All notes →</a>
-        </div>
-        <ol class="notes-list">
-          {notes.map((n) => (
-            <li>
-              <p class="mono"><time datetime={iso(n.data.date)}>{shortDate(n.data.date)}</time>{n.data.sample && <> · <span class="sample-stamp">Sample</span></>}</p>
-              <p class="n-title"><a href={`/notes/${n.id}/`}>{n.data.title}</a></p>
-            </li>
-          ))}
-        </ol>
-      </section>
-    </div>
+    )}
 
-    <section class="section" id="ledger" aria-labelledby="ledger-title">
+    <section class="section" aria-labelledby="projects-title">
       <div class="section-head">
-        <h2 id="ledger-title">The Ledger</h2>
-        <a class="more" href="/ledger/">All {entries.length} entries →</a>
+        <h2 id="projects-title">{featured.length >= 2 ? "Selected projects" : "Projects"}</h2>
+        <a class="more" href="/projects/">All {projects.length} projects →</a>
       </div>
-      <p class="dek">The same sky as a list, most recently tended first.</p>
-      <LedgerList entries={recent} fieldNames={fieldNames} />
+      <ProjectGrid projects={shown} />
     </section>
+
   </div>
 </Base>
 
 <style>
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(2rem, 5vw, 4rem); }
-  @media (max-width: 48rem) { .pair { grid-template-columns: 1fr; } }
-  .done-list, .notes-list { list-style: none; margin: 0.5rem 0 0; padding: 0; }
-  .done-list li, .notes-list li { padding: 0.9rem 0; border-bottom: 1px solid var(--rule); }
-  .done-list p, .notes-list p { margin: 0; }
-  .d-title, .n-title { font-family: var(--serif); font-size: 1.3rem; line-height: 1.25; margin: 0.15rem 0 0.25rem !important; }
+  .section-head { margin-bottom: 1.5rem; }
+  .bench { list-style: none; margin: 0; padding: 0; }
+  .bench li { padding: 1rem 0; border-bottom: 1px solid var(--rule); }
+  .bench li:first-child { padding-top: 0.25rem; }
+  .bench p { margin: 0; }
+  .b-title { font-family: var(--serif); font-size: 1.45rem; line-height: 1.2; margin: 0.2rem 0 0.25rem !important; }
+  .b-sum { color: var(--muted); max-width: 40rem; }
 </style>

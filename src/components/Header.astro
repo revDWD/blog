@@ -2,19 +2,13 @@
 interface Props { current?: string }
 const { current } = Astro.props;
 const nav = [
-  { id: "atlas", label: "Atlas", href: "/" },
-  { id: "ledger", label: "Ledger", href: "/ledger/" },
-  { id: "bench", label: "Bench", href: "/bench/" },
-  { id: "notes", label: "Notes", href: "/notes/" },
+  { id: "home", label: "Workshop", href: "/" },
+  { id: "projects", label: "Projects", href: "/projects/" },
 ];
 ---
 <header class="site-header">
-  <div class="wrap-wide">
-    <p class="brand">
-      <a class="wordmark" href="https://abbydavid.com/" aria-label="Abby + David, main site">Abby<span>+</span>David</a>
-      <span class="slash" aria-hidden="true">/</span>
-      <a class="room" href="/" aria-label="Workshop, home">Workshop</a>
-    </p>
+  <div class="wrap">
+    <a class="wordmark" href="https://abbydavid.com/" aria-label="Abby + David, main site">Abby<span>+</span>David</a>
     <nav class="site-nav" aria-label="Main">
       <ul>
         {nav.map((n) => (
@@ -31,21 +25,17 @@ const nav = [
 </header>
 
 <style>
-  .site-header { padding: 1.25rem 0 0; position: relative; z-index: 5; }
-  .site-header .wrap-wide { display: flex; justify-content: space-between; align-items: center; gap: 0.25rem 1rem; flex-wrap: wrap; }
-  .brand { margin: 0; display: flex; align-items: center; gap: 0.15rem; }
-  .wordmark, .room {
+  .site-header { padding: 1.25rem 0 0; }
+  .site-header .wrap { display: flex; justify-content: space-between; align-items: center; gap: 0.25rem 1rem; flex-wrap: wrap; }
+  .wordmark {
     display: inline-flex; align-items: center; min-height: 2.75rem; background-image: none;
     font-family: var(--serif); font-size: 1.35rem; font-weight: 500; letter-spacing: -0.005em;
   }
   .wordmark span { color: var(--coral); font-style: italic; font-weight: 400; margin-inline: 0.18em; }
   .wordmark:hover, .wordmark:focus-visible { color: var(--ink); }
-  .slash { font-family: var(--serif); font-size: 1.35rem; color: var(--rule); margin-inline: 0.35rem 0.25rem; font-weight: 300; }
-  .room { font-style: italic; font-weight: 400; color: var(--muted); }
-  .room:hover { color: var(--accent); }
 
   .site-nav { margin-left: auto; margin-right: -0.5rem; }
-  .site-nav ul { display: flex; flex-wrap: wrap; align-items: center; gap: 0 clamp(0.1rem, 1.2vw, 0.6rem); list-style: none; margin: 0; padding: 0; }
+  .site-nav ul { display: flex; flex-wrap: wrap; align-items: center; gap: 0 clamp(0.15rem, 1.5vw, 0.75rem); list-style: none; margin: 0; padding: 0; }
   .site-nav li > a {
     display: inline-flex; align-items: center; min-height: 2.75rem; padding-inline: 0.5rem;
     font-size: 1rem; color: var(--muted); background-image: none; position: relative; white-space: nowrap;
@@ -71,14 +61,13 @@ const nav = [
   .theme-toggle .state { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); min-width: 1.6em; }
   .theme-toggle:hover .label { color: var(--accent); }
 
-  @media (max-width: 40rem) {
-    .site-header .wrap-wide { flex-direction: column; align-items: flex-start; gap: 0; }
-    .site-nav { margin: 0 0 0 -0.5rem; }
-    .site-nav li > a { padding-inline: 0.45rem; font-size: 0.95rem; }
-    .theme-toggle .state { display: none; }
-    .theme-toggle .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-    .theme-toggle::before { content: "Dark"; content: "Dark" / ""; font-size: 0.95rem; color: var(--muted); } /* shown, not announced */
-    .theme-toggle { gap: 0.35rem; margin-left: 0; }
+  /* Phones: same treatment as abbydavid.com, so the nav stays on one line */
+  @media (max-width: 26rem) {
+    .site-nav { margin: 0 0 0 -0.35rem; }
+    .site-nav li > a { padding-inline: 0.35rem; font-size: 0.95rem; }
+    .theme-toggle { gap: 0.35rem; padding: 0 0.25rem; margin-left: 0; }
+    .theme-toggle .label, .theme-toggle .state { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .theme-toggle::before { content: "Dark"; content: "Dark" / ""; color: var(--muted); }
     .theme-toggle .track { width: 2.2rem; }
     .theme-toggle[aria-checked="true"] .track::after { transform: translateX(0.8rem); }
   }

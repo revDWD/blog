@@ -1,4 +1,4 @@
-/* Site-wide behaviour: the theme switch (shared with abbydavid.com) and relative "last tended" times. */
+/* The theme switch, shared with abbydavid.com through the abbydavid-theme key and a .abbydavid.com cookie. */
 
 const KEY = "abbydavid-theme";
 const COLORS = { light: "#f4eee1", dark: "#181512" } as const;
@@ -48,15 +48,3 @@ mq.addEventListener?.("change", (e) => { if (!saved()) apply(e.matches ? "dark" 
 addEventListener("pageshow", () => apply(saved() || (mq.matches ? "dark" : "light")));
 apply(saved() || (mq.matches ? "dark" : "light"));
 
-/* Relative times: <time data-relative datetime="…">Nov 20</time> becomes "3 days ago". */
-const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-for (const el of document.querySelectorAll<HTMLTimeElement>("time[data-relative]")) {
-  const m = el.dateTime.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!m) continue;
-  const then = new Date(+m[1], +m[2] - 1, +m[3]).getTime();
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const days = Math.round((then - today.getTime()) / 86_400_000);
-  if (days > 0 || days < -45) continue; // older than ~6 weeks: the date reads better
-  el.title = el.textContent ?? "";
-  el.textContent = days === 0 ? "today" : rtf.format(days, "day");
-}

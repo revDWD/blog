@@ -1,7 +1,6 @@
 /* ==========================================================
    blog.abbydavid.com: the Workshop
    Tokens are identical to abbydavid.com/styles.css, so the two sites read as one place.
-   Atlas-specific tokens follow, then base, then shared patterns.
    ========================================================== */
 
 @font-face {
@@ -42,19 +41,13 @@
   --highlight: #f0d58a;
   --halo: transparent;
 
-  /* Atlas: engraving ink on paper */
-  --chart-ink: #2b2723;
-  --chart-line: rgb(33 31 28 / 0.55);
-  --chart-grid: rgb(33 31 28 / 0.11);
-  --chart-dust: rgb(33 31 28 / 0.28);
-  --chart-glow: transparent;
 
   --serif: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --wrap: 62rem;
-  --wide: 92rem;
+  --wide: 76rem;
   --measure: 38rem;
   --gutter: clamp(1.25rem, 4vw, 2.5rem);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -66,8 +59,6 @@
     --paper: #181512; --paper-deep: #1f1b17; --surface: #25211c; --ink: #ece4d4; --muted: #b3a892;
     --rule: #3a342b; --edge: #8a806d; --accent: #78c4bc; --accent-soft: #1f3b39; --coral: #e68e72;
     --gold: #d8a840; --moss: #9db97b; --highlight: #5a4713; --halo: #d9cfba;
-    --chart-ink: #efe6d2; --chart-line: rgb(236 228 212 / 0.5); --chart-grid: rgb(236 228 212 / 0.085);
-    --chart-dust: rgb(236 228 212 / 0.4); --chart-glow: rgb(236 228 212 / 0.16);
   }
 }
 :root[data-theme="dark"] {
@@ -75,8 +66,6 @@
   --paper: #181512; --paper-deep: #1f1b17; --surface: #25211c; --ink: #ece4d4; --muted: #b3a892;
   --rule: #3a342b; --edge: #8a806d; --accent: #78c4bc; --accent-soft: #1f3b39; --coral: #e68e72;
   --gold: #d8a840; --moss: #9db97b; --highlight: #5a4713; --halo: #d9cfba;
-  --chart-ink: #efe6d2; --chart-line: rgb(236 228 212 / 0.5); --chart-grid: rgb(236 228 212 / 0.085);
-  --chart-dust: rgb(236 228 212 / 0.4); --chart-glow: rgb(236 228 212 / 0.16);
 }
 
 /* ---------- Base ---------- */
@@ -145,17 +134,13 @@ a.plain, .plain a { background: none; padding: 0; }
 }
 .page-head .lede { font-family: var(--serif); font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem); line-height: 1.4; max-width: 36rem; margin: 0; color: var(--muted); text-wrap: pretty; }
 
-/* ---------- Status pill (text + glyph; never colour alone) ---------- */
-.status-pill { display: inline-flex; align-items: center; gap: 0.4em; white-space: nowrap; }
-.status-pill svg { width: 0.95em; height: 0.95em; flex: none; overflow: visible; }
-.status-pill[data-glyph="bench"] { color: var(--coral); }
-
-/* ---------- Sample stamp: placeholder content is always labelled ---------- */
-.sample-stamp {
-  display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.72rem;
-  letter-spacing: 0.06em; text-transform: uppercase; color: var(--coral);
-  border: 1px solid currentColor; padding: 0.12rem 0.45rem; border-radius: 2px; transform: rotate(-1.5deg);
-}
+/* ---------- Status: a small mark plus the word (never colour alone) ---------- */
+.status { display: inline-flex; align-items: center; gap: 0.45em; white-space: nowrap; }
+.status::before { content: ""; width: 0.55em; height: 0.55em; border-radius: 50%; background: var(--muted); flex: none; }
+.status[data-status="live"]::before { background: var(--moss); }
+.status[data-status="in-progress"]::before { background: var(--coral); }
+.status[data-status="concept"]::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--muted); }
+.status[data-status="archived"]::before { background: var(--rule); }
 
 /* ---------- Figures ---------- */
 .fig { margin: 0; }
@@ -166,12 +151,6 @@ a.plain, .plain a { background: none; padding: 0; }
 .fig figcaption { margin-top: 0.6rem; display: flex; gap: 0.75rem; font-size: 0.8rem; line-height: 1.45; font-family: var(--mono); color: var(--muted); }
 .fig .num { flex: none; color: var(--coral); }
 
-/* ---------- Tags ---------- */
-.tags { display: flex; flex-wrap: wrap; gap: 0.35rem 0.5rem; list-style: none; margin: 0; padding: 0; }
-.tags a { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); background: none; padding: 0.15rem 0; }
-.tags a::before { content: "#"; color: var(--rule); margin-right: 0.1em; }
-.tags a:hover { color: var(--accent); }
-
 /* ---------- Code (Shiki dual theme follows data-theme) ---------- */
 .astro-code, .astro-code span { color: var(--shiki-light); background-color: var(--shiki-light-bg); }
 :root[data-theme="dark"] .astro-code, :root[data-theme="dark"] .astro-code span { color: var(--shiki-dark); background-color: var(--shiki-dark-bg); }
@@ -179,16 +158,7 @@ a.plain, .plain a { background: none; padding: 0; }
   :root:not([data-theme]) .astro-code, :root:not([data-theme]) .astro-code span { color: var(--shiki-dark); background-color: var(--shiki-dark-bg); }
 }
 
-/* ---------- Page transitions: a quiet cross-fade, header stays put ---------- */
-@view-transition { navigation: auto; }
-.site-header { view-transition-name: site-header; }
-::view-transition-old(root) { animation: 160ms ease-in both vt-out; }
-::view-transition-new(root) { animation: 320ms var(--ease-out) both vt-in; }
-@keyframes vt-out { to { opacity: 0; } }
-@keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
-
 @media (prefers-reduced-motion: reduce) {
-  @view-transition { navigation: none; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }

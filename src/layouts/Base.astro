@@ -11,11 +11,11 @@ interface Props {
   type?: "website" | "article";
   jsonld?: Record<string, unknown> | Record<string, unknown>[];
   noindex?: boolean;
-  current?: "atlas" | "ledger" | "bench" | "notes";
+  current?: "home" | "projects";
   published?: Date;
   modified?: Date;
 }
-const { title, description, image = "/og/default.png", imageAlt = "The Abby + David workshop atlas: projects charted as stars.", type = "website", jsonld, noindex = false, current, published, modified } = Astro.props;
+const { title, description, image = "https://abbydavid.com/assets/og-image.png", imageAlt = "Abby + David", type = "website", jsonld, noindex = false, current, published, modified } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(image, Astro.site);
 const fullTitle = title === "Workshop" ? "Workshop · Abby + David" : `${title} · Abby + David Workshop`;
@@ -52,8 +52,6 @@ const ld = [siteLd, ...(jsonld ? (Array.isArray(jsonld) ? jsonld : [jsonld]) : [
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={imageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     {published && <meta property="article:published_time" content={published.toISOString()} />}
@@ -64,9 +62,7 @@ const ld = [siteLd, ...(jsonld ? (Array.isArray(jsonld) ? jsonld : [jsonld]) : [
     <script is:inline>
       (function(){var d=document.documentElement,t=null,m;try{m=document.cookie.match(/(?:^|; )abbydavid-theme=(light|dark)/);t=m?m[1]:localStorage.getItem("abbydavid-theme")}catch(e){}
       if(t!=="light"&&t!=="dark")t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
-      d.setAttribute("data-theme",t);d.style.colorScheme=t;
-      try{if(sessionStorage.getItem("workshop-drawn"))d.setAttribute("data-drawn","")}catch(e){}
-      d.classList.add("js")})()
+      d.setAttribute("data-theme",t);d.style.colorScheme=t})()
     </script>
   </head>
   <body>

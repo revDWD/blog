@@ -1,25 +1,18 @@
 {
   "name": "abbydavid-workshop",
   "type": "module",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check",
-    "build:clean": "INCLUDE_SAMPLES=false astro build"
+    "check": "astro check"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.6",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.6",
-    "@expo-google-fonts/ibm-plex-mono": "^0.4.2",
-    "@expo-google-fonts/newsreader": "^0.4.1",
-    "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
-    "@fontsource-variable/newsreader": "^5.3.0",
-    "@fontsource/ibm-plex-mono": "^5.3.0",
-    "@resvg/resvg-js": "^2.6.2",
     "astro": "^7.4.13"
   },
   "engines": {
